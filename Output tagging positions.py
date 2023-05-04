@@ -5,7 +5,7 @@ import math
 
 fabric_name = "home_shape"
 saved_image_path = f"./saving_information/{fabric_name}/fabric_image.jpg"
-new_image_path = "A:/Internship MAS/23.04.2023/Fabric_Images/IMG_20230503_204753.jpg"
+new_image_path = "A:/Internship MAS/23.04.2023/Fabric_Images/IMG_20230503_204656.jpg"
 white_count_list = list()
 
 
@@ -124,6 +124,74 @@ def gcode_making(rot_xy, midpoint, image):
     return image, g_codes
 
 
+def adjust_coordinates(new, old, angle, rot_coordinates, value=70):
+    adjust_rot_coordinates = [[x, y] for x, y in rot_coordinates]  # save a copy for future use
+    rot_img_old = rotate_image(old, -angle)
+    interference_image = cv2.bitwise_xor(rot_img_old, new)
+
+    height, width = new.shape[:2]
+    mm = cv2.bitwise_and(interference_image, rot_img_old)
+    mn = cv2.bitwise_and(interference_image, new)
+
+    h, w = new.shape[:2]
+    counter = -1
+    for x_rel, y_rel in rot_coordinates:
+        counter += 1
+
+        x_abs = int((int(x_rel) * 1) + h / 2)
+        y_abs = int((int(y_rel) * -1) + h / 2)
+
+        x, y, size, mid = x_abs, y_abs, value, value // 2
+
+        cropped_img_mn = mn[max(0, y - size // 2):min(h, y + size // 2), max(0, x - size // 2):min(w, x + size // 2)]
+        cropped_img_mm = mm[max(0, y - size // 2):min(h, y + size // 2), max(0, x - size // 2):min(w, x + size // 2)]
+
+        white_pixels_mn, mn_white_count = np.argwhere(cropped_img_mn > 127), [0, 0, 0, 0]  # +x, -x, +y, -y
+        white_pixels_mm, mm_white_count = np.argwhere(cropped_img_mm > 127), [0, 0, 0, 0]  # +x, -x, +y, -y
+
+        val = 1
+        for y, x in white_pixels_mn:
+            if x > value//2:
+                if (value // 2 + val) > y > (value // 2 - val):
+                    mn_white_count[0] += 1
+            else:
+                if (value // 2 + val) > y > (value // 2 - val):
+                    mn_white_count[1] += 1
+            if y < value//2:
+                if (value // 2 + val) > x > (value // 2 - val):
+                    mn_white_count[2] += 1
+            else:
+                if (value // 2 + val) > x > (value // 2 - val):
+                    mn_white_count[3] += 1
+
+        for y, x in white_pixels_mm:
+            if x > value//2:
+                if (value // 2 + val) > y > (value // 2 - val):
+                    mm_white_count[0] += 1
+            else:
+                if (value // 2 + val) > y > (value // 2 - val):
+                    mm_white_count[1] += 1
+            if y < value//2:
+                if (value // 2 + val) > x > (value // 2 - val):
+                    mm_white_count[2] += 1
+            else:
+                if (value // 2 + val) > x > (value // 2 - val):
+                    mm_white_count[3] += 1
+
+        print(mn_white_count)
+        print(mm_white_count)
+
+        cv2.imshow("n", cropped_img_mn)
+        cv2.imshow("m", cropped_img_mm)
+
+        adjust_rot_coordinates[counter][0] += (mn_white_count[0] - mn_white_count[1] - mm_white_count[0] + mn_white_count[1])//1
+        adjust_rot_coordinates[counter][1] += (mn_white_count[2] - mn_white_count[3] - mm_white_count[2] + mm_white_count[3]) //1
+
+    cv2.imshow("mm", mm)
+    cv2.imshow("mn", mn)
+
+    return adjust_rot_coordinates
+
 # -------------------------------------------------------------------------------------
 
 
@@ -148,23 +216,23 @@ cropped_old_image = get_largest_contour_image(cropped_old_image)
 cropped_new_image = get_largest_contour_image(cropped_new_image)
 
 angle_of_the_image, white_px_count = find_angle_of_new_image(cropped_new_image, cropped_old_image)
-print(angle_of_the_image)
 
 xy_coordinates = read_coordinates(f"./saving_information/{fabric_name}/positions.txt")
 rotated_coordinates = rotate_coordinate_list(xy_coordinates, -angle_of_the_image)
+print(rotated_coordinates)
+new_rot_coordinates = adjust_coordinates(cropped_new_image, cropped_old_image, angle_of_the_image, rotated_coordinates)
+print(new_rot_coordinates)
+
+rotated_coordinates = new_rot_coordinates
 
 final_image, sending_codes = gcode_making(rotated_coordinates, mid_point, normal_image)
-
-a = rotate_image(cropped_new_image, angle_of_the_image)  # for trouble shooting
-ab = cv2.bitwise_xor(a, cropped_old_image)  # for trouble shooting
 
 draw_circles_on_image(old_first_image, xy_coordinates)
 draw_circles_on_image(new_first_image, rotated_coordinates)
 
-cv2.imshow("result", ab)  # for trouble shooting
 cv2.imshow("old_first_image", old_first_image)
 cv2.imshow("new_first_image", new_first_image)
-cv2.imshow("final image", final_image)
+# cv2.imshow("final image", final_image)
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
