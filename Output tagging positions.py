@@ -5,7 +5,7 @@ import math
 
 fabric_name = "home_shape"
 saved_image_path = f"./saving_information/{fabric_name}/fabric_image.jpg"
-new_image_path = "A:/Internship MAS/23.04.2023/Fabric_Images/IMG_20230503_204656.jpg"
+new_image_path = "A:/Internship MAS/23.04.2023/Fabric_Images/IMG_20230503_204753.jpg"
 white_count_list = list()
 
 
@@ -35,7 +35,7 @@ def crop_square_from_image(image, midpoint, square_size):
     x = midpoint[0] - (square_size // 2)
     y = midpoint[1] - (square_size // 2)
 
-    cropped_image = image[y:y+square_size, x:x+square_size]
+    cropped_image = image[y:y + square_size, x:x + square_size]
     return cropped_image
 
 
@@ -104,8 +104,8 @@ def rotate_coordinate_list(coords, angle_degrees):
 def draw_circles_on_image(img, coords):
     h, w = img.shape[:2]
     for x_rel, y_rel in coords:
-        x_abs = int((int(x_rel) * 1) + h/2)
-        y_abs = int((int(y_rel) * -1) + h/2)
+        x_abs = int((int(x_rel) * 1) + h / 2)
+        y_abs = int((int(y_rel) * -1) + h / 2)
         cv2.circle(img, (x_abs, y_abs), 3, (0, 0, 0), -1)
 
     return img
@@ -124,10 +124,69 @@ def gcode_making(rot_xy, midpoint, image):
     return image, g_codes
 
 
-def adjust_coordinates(new, old, angle, rot_coordinates, value=70):
+def adjust_coordinates(new, old, angle, org_coordinates, rot_coordinates):
+
+    def get_quadrant(x, y):
+        if x > 0 and y > 0:
+            return 1
+        elif x < 0 and y > 0:
+            return 2
+        elif x < 0 and y < 0:
+            return 3
+        elif x > 0 and y < 0:
+            return 4
+        else:
+            return 0
+
+    center_point = list(map(lambda x: x // 2, reversed(new.shape[:2])))[0]
     adjust_rot_coordinates = [[x, y] for x, y in rot_coordinates]  # save a copy for future use
+    contour_old = cv2.findContours(old, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0][0]
+    contour_new = cv2.findContours(new, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0][0]
+
+    old_near_dists, new_near_dists = [], []
+    difference_each_point = []
+    counter = 0
+    for (x_old, y_old), (x_new, y_new) in zip(org_coordinates, rot_coordinates):
+        point_old = int((int(x_old) * 1) + center_point), int((int(y_old) * -1) + center_point)
+        point_new = int((int(x_new) * 1) + center_point), int((int(y_new) * -1) + center_point)
+
+        cv2.circle(old, point_old, 2, (0, 0, 0), -1)
+        cv2.circle(new, point_new, 2, (0, 0, 0), -1)
+
+        nearest_point_old = cv2.pointPolygonTest(contour_old, point_old, True)
+        nearest_point_new = cv2.pointPolygonTest(contour_new, point_new, True)
+
+        difference_each_point.append(nearest_point_new - nearest_point_old)
+        old_near_dists.append(nearest_point_old)
+        new_near_dists.append(nearest_point_new)
+        quad = get_quadrant(x_new, y_new)
+
+        if counter != 5:
+            if quad == 1:
+                adjust_rot_coordinates[counter][0] += (nearest_point_new - nearest_point_old)
+                adjust_rot_coordinates[counter][1] += (nearest_point_new - nearest_point_old)
+            elif quad == 2:
+                adjust_rot_coordinates[counter][0] += (nearest_point_new - nearest_point_old)
+                adjust_rot_coordinates[counter][1] += (nearest_point_new - nearest_point_old)
+            elif quad == 3:
+                adjust_rot_coordinates[counter][0] += (nearest_point_new - nearest_point_old)
+                adjust_rot_coordinates[counter][1] += (nearest_point_new - nearest_point_old)
+            elif quad == 4:
+                adjust_rot_coordinates[counter][0] -= (nearest_point_new - nearest_point_old)
+                adjust_rot_coordinates[counter][1] -= (nearest_point_new - nearest_point_old)
+            else:
+                adjust_rot_coordinates[counter][0] += 0
+                adjust_rot_coordinates[counter][1] += 0
+            print(quad)
+        counter += 1
+
+    print("dif - ", difference_each_point)
+
+    cv2.imshow("binary", old)
+    cv2.imshow("binary_2", new)
 
     return adjust_rot_coordinates
+
 
 # -------------------------------------------------------------------------------------
 
@@ -138,7 +197,7 @@ new_image = cv2.imread(new_image_path)
 h, w, _ = new_image.shape
 h_n, w_n, _ = saved_image.shape
 
-new_h = int((9/16) * 1200)
+new_h = int((9 / 16) * 1200)
 new_image = cv2.resize(new_image, (1200, new_h), interpolation=cv2.INTER_LINEAR)
 normal_image = new_image.copy()
 fabric, mid_point = detect_fabric_location(new_image)
@@ -157,7 +216,8 @@ angle_of_the_image, white_px_count = find_angle_of_new_image(cropped_new_image, 
 xy_coordinates = read_coordinates(f"./saving_information/{fabric_name}/positions.txt")
 rotated_coordinates = rotate_coordinate_list(xy_coordinates, -angle_of_the_image)
 print(rotated_coordinates)
-new_rot_coordinates = adjust_coordinates(cropped_new_image, cropped_old_image, angle_of_the_image, rotated_coordinates)
+new_rot_coordinates = adjust_coordinates(cropped_new_image, cropped_old_image, angle_of_the_image, xy_coordinates,
+                                         rotated_coordinates)
 print(new_rot_coordinates)
 
 #rotated_coordinates = new_rot_coordinates
