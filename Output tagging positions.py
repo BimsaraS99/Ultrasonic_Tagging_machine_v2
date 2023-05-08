@@ -2,10 +2,11 @@ import os
 import cv2
 import numpy as np
 import math
+from coordinate_adjustments import adjust_coordinates
 
 fabric_name = "home_shape"
 saved_image_path = f"./saving_information/{fabric_name}/fabric_image.jpg"
-new_image_path = "A:/Internship MAS/23.04.2023/Fabric_Images/IMG_20230503_204724.jpg"
+new_image_path = "A:/Internship MAS/23.04.2023/Fabric_Images/IMG_20230503_204734.jpg"
 white_count_list = list()
 
 
@@ -124,28 +125,6 @@ def gcode_making(rot_xy, midpoint, image):
     return image, g_codes
 
 
-def adjust_coordinates(new, old, angle, org_coordinates):
-    new = rotate_image(new, angle)
-    contour_old = cv2.findContours(old, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0][0]
-    contour_new = cv2.findContours(new, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0][0]
-
-    rect_new = cv2.minAreaRect(contour_new)
-    rect_old = cv2.minAreaRect(contour_old)
-    box_new = np.intp(cv2.boxPoints(rect_new))
-    box_old = np.intp(cv2.boxPoints(rect_old))
-
-    cv2.drawContours(new, [box_new], 0, (255, 255, 255), 2)
-    cv2.drawContours(old, [box_old], 0, (255, 255, 255), 2)
-
-    print(rect_new, "\n", rect_old)
-    cv2.imshow('Image with rectangle', new)
-    cv2.imshow('Image with rectangle_1', old)
-
-    adjust_rot_coordinates = rotate_coordinate_list(org_coordinates, -angle + ((rect_new[2] - rect_old[2]) * 8))
-    print(rect_new[2] - rect_old[2])
-
-    return adjust_rot_coordinates
-
 # ---------------------------------------------------------------------------------------------------------------------
 
 
@@ -172,12 +151,10 @@ cropped_new_image = get_largest_contour_image(cropped_new_image)
 angle_of_the_image, white_px_count = find_angle_of_new_image(cropped_new_image, cropped_old_image)
 
 xy_coordinates = read_coordinates(f"./saving_information/{fabric_name}/positions.txt")
-rotated_coordinates = rotate_coordinate_list(xy_coordinates, -angle_of_the_image)
-print(rotated_coordinates)
-new_rot_coordinates = adjust_coordinates(cropped_new_image, cropped_old_image, angle_of_the_image, xy_coordinates)
-print(new_rot_coordinates)
 
-rotated_coordinates = new_rot_coordinates
+rotated_coordinates = rotate_coordinate_list(xy_coordinates, -angle_of_the_image)
+new_rot_coordinates = adjust_coordinates(cropped_new_image, cropped_old_image, angle_of_the_image, xy_coordinates,
+                                         rotated_coordinates)
 
 final_image, sending_codes = gcode_making(rotated_coordinates, mid_point, normal_image)
 
