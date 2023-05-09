@@ -1,7 +1,7 @@
 import os
 import cv2
 
-read_image_path = "A:/Internship MAS/23.04.2023/Fabric_Images/IMG_20230503_204715.jpg"
+read_image_path = "A:/Internship MAS/23.04.2023/Fabric_Images/IMG_20230503_204704.jpg"
 fabric_name = "home_shape"
 path_to_save = "./saving_information/"
 counter = 0
