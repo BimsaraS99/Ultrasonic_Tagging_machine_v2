@@ -154,13 +154,12 @@ rotated_coordinates = rotate_coordinate_list(xy_coordinates, -angle_of_the_image
 new_rot_coordinates = adjust_coordinates(cropped_new_image, cropped_old_image, angle_of_the_image, xy_coordinates)
 
 final_image, sending_codes = gcode_making(rotated_coordinates, mid_point, normal_image)
-
 draw_circles_on_image(old_first_image, xy_coordinates)
 draw_circles_on_image(new_first_image, rotated_coordinates)
 
 cv2.imshow("old_first_image", old_first_image)
 cv2.imshow("new_first_image", new_first_image)
-# cv2.imshow("final image", final_image)
+cv2.imshow("final image", final_image)
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()

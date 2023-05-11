@@ -18,21 +18,19 @@ def adjust_coordinates(new, old, angle, org_coordinates):
         old_c.append((x, y))
 
     corners_new, corners_old = match_coordinates(new_c, old_c, 25)
-    old_converted_coordinates, old_converted_distance, old_angles = [], [], []
+    old_converted_coordinates = []
 
     for coordinate in org_coordinates:
         x_abs, y_abs = int((int(coordinate[0]) * 1) + center), int((int(coordinate[1]) * -1) + center)
         old_converted_coordinates.append((x_abs, y_abs))
-        dist_list, angles = distances_to_coordinates((x_abs, y_abs), corners_old)
-        old_converted_distance.append(dist_list)
-        old_angles.append(angles)
-    offset_values = find_offset_number(old, old_converted_coordinates)
 
-    print("offset value - ", offset_values)
-    print("old_dist - ", old_converted_distance)
-    print("corner new - ", corners_new)
-    print("corner old - ", corners_old)
-    print("angles - ", old_angles)
+    offset_values = find_offset_number(old, old_converted_coordinates)
+    coordinate_angles = calculate_angles(center, center, old_converted_coordinates)
+    corner_angles_old = calculate_angles(center, center, corners_old)
+    corner_angles_new = calculate_angles(center, center, corners_new)
+
+    find_new_coordinates(new, offset_values, corner_angles_old, corner_angles_new, coordinate_angles,
+                         old_converted_coordinates)
 
     for corner_new, corner_old in zip(corners_new, corners_old):
         cv2.circle(new, corner_new, 1, (0, 255, 0), -1)
@@ -72,31 +70,6 @@ def match_coordinates(coords1, coords2, threshold=15):
     return matched_coords1, matched_coords2
 
 
-def distances_to_coordinates(pt, coord_list):
-    distances = []
-    angles = []
-    for coord in coord_list:
-        dx = coord[0] - pt[0]  # Calculate x distance
-        dy = coord[1] - pt[1]  # Calculate y distance
-        distance = math.sqrt(dx**2 + dy**2)  # Calculate Euclidean distance
-        angle_rad = math.atan2(dy, dx)  # Calculate angle in radians
-        angle_deg = math.degrees(angle_rad)  # Convert angle to degrees
-        distances.append(distance)
-        angles.append(angle_deg)
-
-    return distances, angles
-
-
-def draw_line_at_angle(img, start_x, start_y, angle_deg, line_length, thickness, color):
-    angle_rad = math.radians(angle_deg)  # Convert angle to radians
-    end_x = int(start_x + line_length * math.cos(angle_rad))
-    end_y = int(start_y + line_length * math.sin(angle_rad))
-
-    cv2.line(img, (start_x, start_y), (end_x, end_y), color, thickness)
-
-    return img
-
-
 def resize_image(image, scale_factor):
     height, width = image.shape[:2]
     new_height = int(height * scale_factor)
@@ -130,3 +103,89 @@ def find_offset_number(image, x_and_y):
             counter += 1
 
     return offset_values
+
+
+def calculate_angles(cx, cy, xys):
+    angles = []
+    for x, y in xys:
+        angle = math.atan2(y-cy, x-cx) * 180 / math.pi
+        angles.append(angle)
+    return angles
+
+
+def find_nearest_angle(main_angle, angle_list):
+    angle_array = np.array(angle_list)
+    angle_diff = angle_array - main_angle
+    angle_diff_abs = np.abs(angle_diff)
+    nearest_index = np.argmin(angle_diff_abs)
+    nearest_angle = angle_list[nearest_index]
+    angle_diff_nearest = angle_diff[nearest_index]
+
+    return nearest_angle, nearest_index, angle_diff_nearest
+
+
+def draw_line_from_center(image, angle_degrees):
+    height, width = image.shape[:2]
+
+    center_x = int(width / 2)
+    center_y = int(height / 2)
+    center_point = (center_x, center_y)
+
+    angle_radians = math.radians(angle_degrees)
+
+    line_length = int(min(width, height))
+    end_x = center_x + int(line_length * math.cos(angle_radians))
+    end_y = center_y - int(line_length * math.sin(angle_radians))
+    endpoint = (end_x, end_y)
+
+    image_with_line = cv2.line(image, center_point, endpoint, (255, 255, 255), 1)
+
+    return (center_x, center_y), (end_x, end_y)
+
+
+def find_coinciding_coordinates(coords, start_point, end_point):
+    coinciding_coords = []
+    for coord in coords:
+        x1, y1 = start_point
+        x2, y2 = end_point
+        x3, y3 = coord
+        # calculate the distance from the coordinate to the line segment
+        distance = np.abs((y2-y1)*x3 - (x2-x1)*y3 + x2*y1 - y2*x1) / np.sqrt((y2-y1)**2 + (x2-x1)**2)
+        # check if the distance is within a certain threshold (e.g. 1 pixel)
+        if distance < 1:
+            coinciding_coords.append(coord)
+    return coinciding_coords
+
+
+def find_new_coordinates(image, offset_values, corner_ang_old, corner_ang_new, coordinate_ang, old_coordinate):
+    print("offset - ", offset_values)
+    print("corner_ang_old - ", corner_ang_old)
+    print("corner_ang_new - ", corner_ang_new)
+    print("coordinate ang - ", coordinate_ang)
+    print("old coordi - ", old_coordinate)
+    counter = 0
+    for offset_value in offset_values:
+        height, width = image.shape
+        image_resize = resize_image(image, offset_value/100)
+        image_resize = cv2.resize(add_border(image_resize, (0, 0, 0), width), (height, width))
+
+        blank_image = np.zeros((height, width), dtype=np.uint8)
+        contour, _ = cv2.findContours(image_resize, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cv2.drawContours(blank_image, contour, -1, (255, 255, 255), 1)
+
+        nearest_angle, nearest_an_index, difference = find_nearest_angle(coordinate_ang[counter], corner_ang_old)
+        new_coordinate_angle = corner_ang_new[nearest_an_index] - difference
+
+        white_pixels = np.where(blank_image == 255)
+        white_pixels = list(zip(white_pixels[1], white_pixels[0]))
+        center_xy, end_xy = draw_line_from_center(blank_image, -new_coordinate_angle)
+
+        a = find_coinciding_coordinates(white_pixels, center_xy, end_xy)
+        cv2.circle(blank_image, (116, 371), 1, (255, 255, 255), thickness=2)
+
+        print("nearest an - ", nearest_angle, nearest_an_index, difference, new_coordinate_angle)
+        print("coincide", a)
+        cv2.imshow("reig", blank_image)
+        counter += 1
+
+        break

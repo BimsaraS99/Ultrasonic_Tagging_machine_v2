@@ -1,16 +1,23 @@
 import cv2
 import numpy as np
 
-# Load the input image
-image = cv2.imread('A:/Internship MAS/23.04.2023/Fabric_Images/fk1.jpg')
+# Load the image and convert it to grayscale
+image = cv2.imread("A:/Internship MAS/23.04.2023/Fabric_Images/fk1.jpg")
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-# Set the border size and color
-border_size = 10
-border_color = [255, 255, 255]  # White color
+# Threshold the image to obtain a binary image
+_, thresh = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
 
-# Add the border to the image
-bordered_image = cv2.copyMakeBorder(image, border_size, border_size, border_size, border_size, cv2.BORDER_CONSTANT, value=border_color)
+# Find contours in the binary image
+contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-# Write the output image
-cv2.imshow('output.jpg', bordered_image)
+# Create a blank image with the same dimensions as the input image
+blank_image = np.zeros_like(image)
+
+
+cv2.drawContours(blank_image, contours, -1, (255, 255, 255), 1)
+
+# Display the result
+cv2.imshow('Result', blank_image)
 cv2.waitKey(0)
+cv2.destroyAllWindows()
