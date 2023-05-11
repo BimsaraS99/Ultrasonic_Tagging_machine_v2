@@ -151,9 +151,12 @@ angle_of_the_image, white_px_count = find_angle_of_new_image(cropped_new_image, 
 
 xy_coordinates = read_coordinates(f"./saving_information/{fabric_name}/positions.txt")
 rotated_coordinates = rotate_coordinate_list(xy_coordinates, -angle_of_the_image)
-new_rot_coordinates = adjust_coordinates(cropped_new_image, cropped_old_image, angle_of_the_image, xy_coordinates)
 
-rotated_coordinates = new_rot_coordinates
+try:
+    new_rot_coordinates = adjust_coordinates(cropped_new_image, cropped_old_image, angle_of_the_image, xy_coordinates)
+    rotated_coordinates = new_rot_coordinates
+finally:
+    pass
 
 final_image, sending_codes = gcode_making(rotated_coordinates, mid_point, normal_image)
 draw_circles_on_image(old_first_image, xy_coordinates)

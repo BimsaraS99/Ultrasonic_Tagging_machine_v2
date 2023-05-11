@@ -39,9 +39,9 @@ def adjust_coordinates(new, old, angle, org_coordinates):
         cv2.circle(new, corner_new, 1, (0, 255, 0), -1)
         cv2.circle(old, corner_old, 1, (0, 255, 0), -1)
 
-    concatenated_image = cv2.hconcat([old, new])
-    cv2.imshow('Images with corners', concatenated_image)
+    #concatenated_image = cv2.hconcat([old, new])
 
+    #cv2.imshow('Images with corners', concatenated_image)
     print("org - ", org_coordinates)
     print("updated - ", newest_coordinates)
 
@@ -212,8 +212,12 @@ def find_new_coordinates(image, offset_values, corner_ang_old, corner_ang_new, c
         contour, _ = cv2.findContours(image_resize, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         cv2.drawContours(blank_image, contour, -1, (255, 255, 255), 1)
 
-        nearest_angle, nearest_an_index, difference = find_nearest_angle(coordinate_ang[counter], corner_ang_old)
-        new_coordinate_angle = corner_ang_new[nearest_an_index] - difference
+        if len(corner_ang_old) > 0:
+            nearest_angle, nearest_an_index, difference = find_nearest_angle(coordinate_ang[counter], corner_ang_old)
+            if difference < 45:
+                new_coordinate_angle = corner_ang_new[nearest_an_index] - difference
+            else:
+                new_coordinate_angle = coordinate_ang[counter]
 
         white_pixels = np.where(blank_image == 255)
         white_pixels = list(zip(white_pixels[1], white_pixels[0]))
@@ -229,6 +233,6 @@ def find_new_coordinates(image, offset_values, corner_ang_old, corner_ang_new, c
         #print("nearest an - ", nearest_angle, nearest_an_index, difference, new_coordinate_angle)
         #print("print - ", old_coordinate)
         #print("coincide", up_coordinates)
-        cv2.imshow("reig", blank_image)
+        #cv2.imshow("reig", blank_image)
 
     return updated_coordinates
