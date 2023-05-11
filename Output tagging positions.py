@@ -6,7 +6,7 @@ from coordinate_adjustments import adjust_coordinates
 
 fabric_name = "home_shape"
 saved_image_path = f"./saving_information/{fabric_name}/fabric_image.jpg"
-new_image_path = "A:/Internship MAS/23.04.2023/Fabric_Images/IMG_20230503_204656.jpg"
+new_image_path = "A:/Internship MAS/23.04.2023/Fabric_Images/IMG_20230503_204753.jpg"
 white_count_list = list()
 
 
@@ -152,6 +152,8 @@ angle_of_the_image, white_px_count = find_angle_of_new_image(cropped_new_image, 
 xy_coordinates = read_coordinates(f"./saving_information/{fabric_name}/positions.txt")
 rotated_coordinates = rotate_coordinate_list(xy_coordinates, -angle_of_the_image)
 new_rot_coordinates = adjust_coordinates(cropped_new_image, cropped_old_image, angle_of_the_image, xy_coordinates)
+
+rotated_coordinates = new_rot_coordinates
 
 final_image, sending_codes = gcode_making(rotated_coordinates, mid_point, normal_image)
 draw_circles_on_image(old_first_image, xy_coordinates)

@@ -29,8 +29,11 @@ def adjust_coordinates(new, old, angle, org_coordinates):
     corner_angles_old = calculate_angles(center, center, corners_old)
     corner_angles_new = calculate_angles(center, center, corners_new)
 
-    find_new_coordinates(new, offset_values, corner_angles_old, corner_angles_new, coordinate_angles,
-                         old_converted_coordinates)
+    updated_coordinates = find_new_coordinates(new, offset_values, corner_angles_old, corner_angles_new,
+                                               coordinate_angles, old_converted_coordinates)
+
+    cv2.circle(new, updated_coordinates[0], 1, (0, 0, 0), thickness=2)
+    newest_coordinates = reset_coordinates(updated_coordinates, center, angle)
 
     for corner_new, corner_old in zip(corners_new, corners_old):
         cv2.circle(new, corner_new, 1, (0, 255, 0), -1)
@@ -39,7 +42,38 @@ def adjust_coordinates(new, old, angle, org_coordinates):
     concatenated_image = cv2.hconcat([old, new])
     cv2.imshow('Images with corners', concatenated_image)
 
-    return org_coordinates
+    print("org - ", org_coordinates)
+    print("updated - ", newest_coordinates)
+
+    return newest_coordinates
+
+
+def reset_coordinates(coordinates, center, angle):
+    new_coordinates = []
+    for coordinate in coordinates:
+        x = coordinate[0] - center
+        y = center - coordinate[1]
+        new_coordinates.append((x, y))
+    new_coordinates = rotate_coordinate_list(new_coordinates, -angle)
+    return new_coordinates
+
+
+def rotate_coordinate_list(coords, angle_degrees):
+    def rotate_coordinates(x, y, angle):
+        angle = math.radians(angle)
+        sin = math.sin(angle)
+        cos = math.cos(angle)
+        new_x = x * cos - y * sin
+        new_y = x * sin + y * cos
+
+        return new_x, new_y
+
+    rotated_coords = []
+    for x, y in coords:
+        new_x, new_y = rotate_coordinates(x, y, angle_degrees)
+        rotated_coords.append((new_x, new_y))
+
+    return rotated_coords
 
 
 def rotate_image(img_to_rotate, angle):
@@ -149,21 +183,26 @@ def find_coinciding_coordinates(coords, start_point, end_point):
         x1, y1 = start_point
         x2, y2 = end_point
         x3, y3 = coord
-        # calculate the distance from the coordinate to the line segment
         distance = np.abs((y2-y1)*x3 - (x2-x1)*y3 + x2*y1 - y2*x1) / np.sqrt((y2-y1)**2 + (x2-x1)**2)
-        # check if the distance is within a certain threshold (e.g. 1 pixel)
         if distance < 1:
             coinciding_coords.append(coord)
     return coinciding_coords
 
 
+def find_nearest_coordinate(coord_list, main_coord):
+    distances = []
+    for i, coord in enumerate(coord_list):
+        dist = np.sqrt((coord[0] - main_coord[0])**2 + (coord[1] - main_coord[1])**2)
+        distances.append(dist)
+
+    nearest_index = np.argmin(distances)
+    nearest_coord = coord_list[nearest_index]
+
+    return nearest_coord
+
+
 def find_new_coordinates(image, offset_values, corner_ang_old, corner_ang_new, coordinate_ang, old_coordinate):
-    print("offset - ", offset_values)
-    print("corner_ang_old - ", corner_ang_old)
-    print("corner_ang_new - ", corner_ang_new)
-    print("coordinate ang - ", coordinate_ang)
-    print("old coordi - ", old_coordinate)
-    counter = 0
+    updated_coordinates, counter = [], 0
     for offset_value in offset_values:
         height, width = image.shape
         image_resize = resize_image(image, offset_value/100)
@@ -180,12 +219,16 @@ def find_new_coordinates(image, offset_values, corner_ang_old, corner_ang_new, c
         white_pixels = list(zip(white_pixels[1], white_pixels[0]))
         center_xy, end_xy = draw_line_from_center(blank_image, -new_coordinate_angle)
 
-        a = find_coinciding_coordinates(white_pixels, center_xy, end_xy)
-        cv2.circle(blank_image, (116, 371), 1, (255, 255, 255), thickness=2)
-
-        print("nearest an - ", nearest_angle, nearest_an_index, difference, new_coordinate_angle)
-        print("coincide", a)
-        cv2.imshow("reig", blank_image)
+        up_coordinates = find_coinciding_coordinates(white_pixels, center_xy, end_xy)
+        up_coordinates = find_nearest_coordinate(up_coordinates, old_coordinate[counter])
+        updated_coordinates.append(up_coordinates)
         counter += 1
 
-        break
+        cv2.circle(blank_image, (128, 370), 1, (255, 255, 255), thickness=2)
+
+        #print("nearest an - ", nearest_angle, nearest_an_index, difference, new_coordinate_angle)
+        #print("print - ", old_coordinate)
+        #print("coincide", up_coordinates)
+        cv2.imshow("reig", blank_image)
+
+    return updated_coordinates
