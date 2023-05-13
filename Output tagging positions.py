@@ -1,4 +1,3 @@
-import os
 import cv2
 import numpy as np
 import math
@@ -6,7 +5,7 @@ from coordinate_adjustments import adjust_coordinates
 
 fabric_name = "home_shape"
 saved_image_path = f"./saving_information/{fabric_name}/fabric_image.jpg"
-new_image_path = "A:/Internship MAS/23.04.2023/Fabric_Images/IMG_20230503_204753.jpg"
+new_image_path = "A:/Internship MAS/23.04.2023/Fabric_Images/IMG_20230503_204734.jpg"
 white_count_list = list()
 
 
@@ -107,7 +106,7 @@ def draw_circles_on_image(img, coords):
     for x_rel, y_rel in coords:
         x_abs = int((int(x_rel) * 1) + h / 2)
         y_abs = int((int(y_rel) * -1) + h / 2)
-        cv2.circle(img, (x_abs, y_abs), 3, (0, 0, 0), -1)
+        cv2.circle(img, (x_abs, y_abs), 2, (0, 0, 0), -1)
 
     return img
 
@@ -117,7 +116,7 @@ def gcode_making(rot_xy, midpoint, image):
     for x_rel, y_rel in rot_xy:
         x_abs = int((int(x_rel) * 1) + midpoint[0])
         y_abs = int((int(y_rel) * -1) + midpoint[1])
-        cv2.circle(image, (x_abs, y_abs), 3, (0, 0, 0), -1)
+        cv2.circle(image, (x_abs, y_abs), 2, (0, 0, 0), -1)
         text = f"({x_abs}, {y_abs})"
         cv2.putText(image, text, (x_abs + 5, y_abs - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 0, 0), 1)
         g_codes.append((x_abs, y_abs))
