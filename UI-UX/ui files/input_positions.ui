@@ -14,19 +14,658 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>150</y>
-      <width>311</width>
-      <height>121</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Input data</string>
-    </property>
-   </widget>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QFrame" name="main_frame">
+      <property name="styleSheet">
+       <string notr="true">QFrame{
+	background-color:rgb(38, 23, 66);
+	color:rgb(220, 220, 220);
+}</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QFrame" name="select_color">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>170</y>
+         <width>231</width>
+         <height>271</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QFrame{
+	background-color:rgb(23, 14, 40);
+	color:rgb(220, 220, 220);
+	border-radius: 10px;
+}</string>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QPushButton" name="color_red">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>160</y>
+          <width>171</width>
+          <height>41</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Candara</family>
+          <pointsize>-1</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+    background-color: rgb(50, 50, 255);
+    color: #333333;
+    border-radius: 20px;
+    border: none;
+    padding: 10px 20px;
+    font-size: 17px;
+	cursor: pointer;
+}
+
+QPushButton:hover {
+    background-color: rgb(100, 100, 255);
+	font-size: 18px;
+}
+
+QPushButton:pressed {
+    background-color: rgb(50, 50, 255);
+}</string>
+        </property>
+        <property name="text">
+         <string>BLUE</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="color_green">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>110</y>
+          <width>171</width>
+          <height>41</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Candara</family>
+          <pointsize>-1</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+    background-color: rgb(50, 255, 50);
+    color: #333333;
+    border-radius: 20px;
+    border: none;
+    padding: 10px 20px;
+    font-size: 17px;
+	cursor: pointer;
+}
+
+QPushButton:hover {
+    background-color: rgb(100, 255, 100);
+	font-size: 18px;
+}
+
+QPushButton:pressed {
+    background-color: rgb(50, 255, 50);
+}</string>
+        </property>
+        <property name="text">
+         <string>GREEN</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="color_blue">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>60</y>
+          <width>171</width>
+          <height>41</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Candara</family>
+          <pointsize>-1</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+    background-color: rgb(255, 50, 50);
+    color: #333333;
+    border-radius: 20px;
+    border: none;
+    padding: 10px 20px;
+    font-size: 17px;
+	cursor: pointer;
+}
+
+QPushButton:hover {
+    background-color: rgb(255, 100, 100);
+	font-size: 18px;
+}
+
+QPushButton:pressed {
+    background-color: rgb(255, 50, 50);
+}
+</string>
+        </property>
+        <property name="text">
+         <string>RED</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="color_gray">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>210</y>
+          <width>171</width>
+          <height>41</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Candara</family>
+          <pointsize>-1</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+    background-color: rgb(170, 170, 170);
+    color: #333333;
+    border-radius: 20px;
+    border: none;
+    padding: 10px 20px;
+    font-size: 17px;
+	cursor: pointer;
+}
+
+QPushButton:hover {
+    background-color: rgb(200, 200, 170);
+	font-size: 18px;
+}
+
+QPushButton:pressed {
+    background-color: rgb(170, 170, 170);
+}</string>
+        </property>
+        <property name="text">
+         <string>GRAY</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_2">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>10</y>
+          <width>231</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color:rgb(255, 170, 255);</string>
+        </property>
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;SELECT &lt;/span&gt;COLOR&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QFrame" name="flip_color">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>90</y>
+         <width>231</width>
+         <height>71</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QFrame{
+	background-color:rgb(23, 14, 40);
+	color:rgb(220, 220, 220);
+	border-radius: 10px;
+}</string>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QCheckBox" name="checkBox">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>10</y>
+          <width>31</width>
+          <height>51</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QCheckBox {
+    font-size: 16px;
+    color:rgb(255, 170, 255) ;
+}
+
+QCheckBox::indicator {
+    width: 20px;
+    height: 20px;
+	border-radius: 7px;
+}
+
+QCheckBox::indicator:unchecked {
+    border: 2px solid #999999;
+    background-color: #FFFFFF;
+}
+
+QCheckBox::indicator:checked {
+    border: 2px solid #4CAF50;
+    background-color: #4CAF50;
+}
+
+QCheckBox::indicator:unchecked:hover {
+    border: 2px solid #666666;
+}
+
+QCheckBox::indicator:checked:hover {
+    border: 2px solid #4CAF50;
+}
+
+QCheckBox::indicator:unchecked:focus, QCheckBox::indicator:checked:focus {
+    outline: none;
+}
+
+QCheckBox::indicator:unchecked:pressed, QCheckBox::indicator:checked:pressed {
+    border: 2px solid #4CAF50;
+}
+
+QCheckBox::indicator:checked {
+    color: #FFFFFF;
+    background-color: #4CAF50;
+}
+</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_3">
+        <property name="geometry">
+         <rect>
+          <x>80</x>
+          <y>20</y>
+          <width>121</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color:rgb(255, 170, 255);</string>
+        </property>
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;FLIP &lt;/span&gt;COLORS&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QPushButton" name="capture_image">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>231</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Candara</family>
+         <pointsize>-1</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    background-color: rgb(255, 170, 255);
+    color: #333333;
+    border-radius: 20px;
+    border: none;
+    padding: 10px 20px;
+    font-size: 17px;
+	cursor: pointer;
+}
+
+QPushButton:hover {
+    background-color: rgb(255, 120, 255);
+	font-size: 18px;
+}
+
+QPushButton:pressed {
+    background-color: rgb(255, 170, 255);
+}
+</string>
+       </property>
+       <property name="text">
+        <string>CAPTURE IMAGE</string>
+       </property>
+      </widget>
+      <widget class="QFrame" name="slider_frame">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>450</y>
+         <width>231</width>
+         <height>101</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QFrame{
+	background-color:rgb(23, 14, 40);
+	color:rgb(220, 220, 220);
+	border-radius: 10px;
+}</string>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QLabel" name="threshold">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>10</y>
+          <width>231</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color:rgb(255, 170, 255);</string>
+        </property>
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;CHANGE&lt;/span&gt; THRESHOLD&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QSlider" name="horizontalSlider">
+        <property name="geometry">
+         <rect>
+          <x>19</x>
+          <y>60</y>
+          <width>191</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QSlider::groove:horizontal {
+    background: #dcdcdc;
+    height: 8px;
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal {
+    background: #4CAF50;
+    border: 1px solid #4CAF50;
+    width: 20px;
+    height: 20px;
+    margin: -6px 0px;
+    border-radius: 10px;
+}
+
+QSlider::handle:horizontal:hover {
+    background: #3e8e41;
+    border: 1px solid #3e8e41;
+}
+
+QSlider::sub-page:horizontal {
+    background: #4CAF50;
+    height: 8px;
+    border-radius: 4px;
+}
+
+QSlider::add-page:horizontal {
+    background: #dcdcdc;
+    height: 8px;
+    border-radius: 4px;
+}
+</string>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QFrame" name="slider_frame_2">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>560</y>
+         <width>231</width>
+         <height>131</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QFrame{
+	background-color:rgb(23, 14, 40);
+	color:rgb(220, 220, 220);
+	border-radius: 10px;
+}</string>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QLabel" name="save">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>10</y>
+          <width>231</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color:rgb(255, 170, 255);</string>
+        </property>
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;SAVE&lt;/span&gt; STYLE&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="save_name">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>50</y>
+          <width>211</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLineEdit {
+    border: 2px solid #dcdcdc;
+    padding: 6px;
+    border-radius: 14px;
+    font-size: 12px;
+    color: #333333;
+}
+
+QLineEdit:hover {
+    border: 2px solid #4CAF50;
+}
+
+QLineEdit:focus {
+    border: 2px solid #4CAF50;
+    outline: none;
+}
+
+QLineEdit:disabled {
+    background-color: #f0f0f0;
+    color: #a0a0a0;
+}
+</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pushButton">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>90</y>
+          <width>81</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+    background-color: #4CAF50;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    padding: 8px 16px;
+}
+
+QPushButton:hover {
+    background-color: #3e8e41;
+}
+
+QPushButton:pressed {
+    background-color: #1f622e;
+}
+
+QPushButton:disabled {
+    background-color: #dcdcdc;
+    color: #a0a0a0;
+}
+</string>
+        </property>
+        <property name="text">
+         <string>OK</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="geometry">
+        <rect>
+         <x>140</x>
+         <y>650</y>
+         <width>81</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    background-color: #4CAF50;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    padding: 8px 16px;
+}
+
+QPushButton:hover {
+    background-color: #3e8e41;
+}
+
+QPushButton:pressed {
+    background-color: #1f622e;
+}
+
+QPushButton:disabled {
+    background-color: #dcdcdc;
+    color: #a0a0a0;
+}
+</string>
+       </property>
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="image_label">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>150</y>
+         <width>950</width>
+         <height>534</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QLabel {
+    font-size: 18px;
+    color: #333333;
+    padding: 2px;
+	background-color: #e0e0e0;
+}
+
+</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>

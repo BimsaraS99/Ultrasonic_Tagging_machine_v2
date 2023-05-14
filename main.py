@@ -1,43 +1,22 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QMainWindow
-from PyQt5.uic import loadUi
-import sys
+import cv2
 
+cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 
-def input_positions():
-    window.close()
-    print("Button 1 clicked")
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
+if not cap.isOpened():
+    print("Unable to open webcam")
+    exit()
 
-def output_positions():
-    print("Button 2 clicked")
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        print("Unable to read frame from webcam")
+        break
 
+    cv2.imshow("Webcam", frame)
+    cv2.waitKey(1)
 
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__(flags=Qt.FramelessWindowHint)
-        # Load the user interface from the .ui file
-        loadUi('UI-UX/ui files/home_page.ui', self)
-        # Connect any signals and slots as needed
-        self.newStyle.clicked.connect(input_positions)
-        self.oldStyle.clicked.connect(output_positions)
-        self.quit.clicked.connect(self.close)
-
-
-class InputWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        loadUi('UI-UX/ui files/input_positions.ui', self)
-
-
-class OutputWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        loadUi('UI-UX/ui files/output_positions.ui', self)
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    window = MainWindow()
-    window.show()
-    sys.exit(app.exec_())
+cap.release()
+cv2.destroyAllWindows()
